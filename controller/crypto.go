@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
 	"keyvaluestore/cryptostore"
 	"keyvaluestore/database"
@@ -35,11 +36,14 @@ func GetSecrets(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	templateCollection := database.GetCollection(database.DB, "secrets")
-	result, err := templateCollection.Find(ctx, bson.D{{}})
+	opts := options.Find().SetProjection(bson.M{
+		"key": 1,
+	})
+	result, err := templateCollection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		panic(err)
 	}
-	var results []bson.M
+	var results []models.Secret
 	if err := result.All(ctx, &results); err != nil {
 		panic(err)
 	}
