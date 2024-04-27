@@ -60,7 +60,12 @@ func GetSecret(c *gin.Context) {
 		}
 		panic(err)
 	}
-	result.Value = cryptostore.DecryptText([]byte(result.Value))
+	clear_text_string, clear_text_status := c.GetQuery("showSecret")
+	if clear_text_status && clear_text_string == "True" {
+		result.Value = cryptostore.DecryptText([]byte(result.Value))
+	} else {
+		result.Value = "*********"
+	}
 	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": result}})
 }
 
