@@ -26,10 +26,10 @@ func CreateSecret(c *gin.Context) {
 	templateCollection := database.GetCollection(database.DB, "secrets")
 	result, err := templateCollection.InsertOne(ctx, newSecret)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, responses.GenericResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		c.JSON(http.StatusInternalServerError, responses.GenericResponse{Status: http.StatusInternalServerError, Message: "error", Data: err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, responses.GenericResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
+	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: result})
 }
 
 func GetSecrets(c *gin.Context) {
@@ -47,7 +47,7 @@ func GetSecrets(c *gin.Context) {
 	if err := result.All(ctx, &results); err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": results}})
+	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: results})
 }
 
 func GetSecret(c *gin.Context) {
@@ -70,7 +70,7 @@ func GetSecret(c *gin.Context) {
 	} else {
 		result.Value = "*********"
 	}
-	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": result}})
+	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: result})
 }
 
 func DelSecret(c *gin.Context) {
@@ -87,7 +87,7 @@ func DelSecret(c *gin.Context) {
 		}
 		panic(err)
 	}
-	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success delete", Data: map[string]interface{}{"data": result}})
+	c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success delete", Data: result})
 }
 
 func PutSecret(c *gin.Context) {
@@ -97,13 +97,13 @@ func PutSecret(c *gin.Context) {
 	var newSecret models.Secret
 	//validate the request body
 	if err := c.BindJSON(&newSecret); err != nil {
-		c.JSON(http.StatusBadRequest, responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		c.JSON(http.StatusBadRequest, responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: err.Error()})
 		return
 	}
 
 	//use the validator library to validate required fields
 	if validationErr := validate.Struct(&newSecret); validationErr != nil {
-		c.JSON(http.StatusBadRequest, responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+		c.JSON(http.StatusBadRequest, responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: validationErr.Error()})
 		return
 	}
 	var result models.Secret
@@ -118,5 +118,5 @@ func PutSecret(c *gin.Context) {
 		panic(err)
 	}
 
-	c.JSON(http.StatusCreated, responses.GenericResponse{Status: http.StatusCreated, Message: "success replaced", Data: map[string]interface{}{"data": result}})
+	c.JSON(http.StatusCreated, responses.GenericResponse{Status: http.StatusCreated, Message: "success replaced", Data: result})
 }
